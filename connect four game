@@ -1,0 +1,134 @@
+import java.util.Scanner;
+
+public class ConnectFour {
+    private static final int ROWS = 6;
+    private static final int COLS = 7;
+    private static final char PLAYER1 = 'X';
+    private static final char PLAYER2 = 'O';
+
+    private static char[][] board = new char[ROWS][COLS];
+
+    public static void main(String[] args) {
+        initializeBoard();
+        playGame();
+    }
+
+    private static void initializeBoard() {
+        for (int row = 0; row < ROWS; row++) {
+            for (int col = 0; col < COLS; col++) {
+                board[row][col] = ' ';
+            }
+        }
+    }
+
+    private static void playGame() {
+        Scanner scanner = new Scanner(System.in);
+        char currentPlayer = PLAYER1;
+        boolean gameOver = false;
+
+        while (!gameOver) {
+            displayBoard();
+            System.out.println("Player " + currentPlayer + ", choose a column (1-7):");
+            int column = scanner.nextInt() - 1;
+
+            if (isColumnFull(column)) {
+                System.out.println("That column is full. Choose another column.");
+                continue;
+            }
+
+            int row = getNextAvailableRow(column);
+            board[row][column] = currentPlayer;
+
+            if (checkWin(currentPlayer)) {
+                displayBoard();
+                System.out.println("Player " + currentPlayer + " wins!");
+                gameOver = true;
+            } else if (checkTie()) {
+                displayBoard();
+                System.out.println("It's a tie!");
+                gameOver = true;
+            } else {
+                currentPlayer = (currentPlayer == PLAYER1) ? PLAYER2 : PLAYER1;
+            }
+        }
+
+        scanner.close();
+    }
+
+    private static boolean isColumnFull(int column) {
+        return board[0][column] != ' ';
+    }
+
+    private static int getNextAvailableRow(int column) {
+        for (int row = ROWS - 1; row >= 0; row--) {
+            if (board[row][column] == ' ') {
+                return row;
+            }
+        }
+        return -1; // Column is full
+    }
+
+    private static boolean checkWin(char player) {
+        // Check horizontal
+        for (int row = 0; row < ROWS; row++) {
+            for (int col = 0; col <= COLS - 4; col++) {
+                if (board[row][col] == player && board[row][col + 1] == player && board[row][col + 2] == player && board[row][col + 3] == player) {
+                    return true;
+                }
+            }
+        }
+
+        // Check vertical
+        for (int row = 0; row <= ROWS - 4; row++) {
+            for (int col = 0; col < COLS; col++) {
+                if (board[row][col] == player && board[row + 1][col] == player && board[row + 2][col] == player && board[row + 3][col] == player) {
+                    return true;
+                }
+            }
+        }
+
+        // Check diagonal (top-left to bottom-right)
+        for (int row = 0; row <= ROWS - 4; row++) {
+            for (int col = 0; col <= COLS - 4; col++) {
+                if (board[row][col] == player && board[row + 1][col + 1] == player && board[row + 2][col + 2] == player && board[row + 3][col + 3] == player) {
+                    return true;
+                }
+            }
+        }
+
+        // Check diagonal (bottom-left to top-right)
+        for (int row = 3; row < ROWS; row++) {
+            for (int col = 0; col <= COLS - 4; col++) {
+                if (board[row][col] == player && board[row - 1][col + 1] == player && board[row - 2][col + 2] == player && board[row - 3][col + 3] == player) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static boolean checkTie() {
+        for (int row = 0; row < ROWS; row++) {
+            for (int col = 0; col < COLS; col++) {
+                if (board[row][col] == ' ') {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static void displayBoard() {
+        System.out.println("-------------");
+        for (int row = 0; row < ROWS; row++) {
+            System.out.print("| ");
+            for (int col = 0; col < COLS; col++) {
+                System.out.print(board[row][col] + " ");
+            }
+            System.out.println("|");
+        }
+        System.out.println("-------------");
+        System.out.println("  1 2 3 4 5 6 7");
+    }
+}
